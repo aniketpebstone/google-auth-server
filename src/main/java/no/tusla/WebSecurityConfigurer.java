@@ -2,40 +2,45 @@ package no.tusla;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
-import org.springframework.web.filter.CommonsRequestLoggingFilter; 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.filter.CommonsRequestLoggingFilter;
+
 @Configuration
-public class WebSecurityConfigurer extends GlobalAuthenticationConfigurerAdapter
-{
-	
+public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
+
+	@Bean
+	public UserDetailsService userDetailsService() {
+		InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+		manager.createUser(User.withUsername("aniket").password("aniket").roles("USER").build());
+		manager.createUser(User.withUsername("admin").password("admin").roles("ADMIN").build());
+		manager.createUser(User.withUsername("api").password("").roles("API").build());
+		manager.createUser(User.withUsername("apotek.no").password("").roles("PHARMACY").build());
+		return manager;
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		PasswordEncoder encoder = NoOpPasswordEncoder.getInstance();
+		return encoder;
+	}
+
+	@Bean
 	@Override
-	public void init(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication()
-		.withUser("aniket")
-		.password("aniket")
-		.roles("USER")
-		.and()		
-		.withUser("levent")
-		.password("levent")
-		.roles("USER")
-		.and()
-		.withUser("jonathan")
-		.password("jonathan")
-		.roles("USER")
-		.and()
-		.withUser("waqar")
-		.password("waqar")
-		.roles("USER")
-		.and()		
-		.withUser("henrik")
-		.password("henrik")
-		.roles("USER", "ADMIN");
-	}  
-	
-	 @Bean
-	public CommonsRequestLoggingFilter requestLoggingFilter()
-	{
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+
+	@Bean
+	public CommonsRequestLoggingFilter requestLoggingFilter() {
 		CommonsRequestLoggingFilter crlf = new CommonsRequestLoggingFilter();
 		crlf.setIncludeClientInfo(true);
 		crlf.setIncludeQueryString(true);
@@ -43,5 +48,6 @@ public class WebSecurityConfigurer extends GlobalAuthenticationConfigurerAdapter
 		crlf.setIncludeHeaders(true);
 		return crlf;
 	}
-	 
+	
+
 }
