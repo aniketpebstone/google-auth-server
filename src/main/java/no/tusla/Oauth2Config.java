@@ -24,7 +24,7 @@ public class Oauth2Config  extends AuthorizationServerConfigurerAdapter
 	 @Override
      public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
-        	.withClient("photoprinter")
+        	.withClient("photo-printer")
         		.secret("1234")
                 .authorizedGrantTypes("authorization_code")	    //add refresh_token grant if you need refresh token
                 .scopes("read-photos", "read-metadata")
